@@ -7,13 +7,12 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'E:/EJ/Horst')
-
 ```
 
 
 ```{r}
 #library load
+install.packages("tidyverse")
 library(tidyverse)
 
 
@@ -27,7 +26,7 @@ library(tidyverse)
 #read calenvironscreen csv which is organized by GeoID
 
 cal_environ_screen <- read.csv("ces3results.csv")
-View(cal_environ_screen)
+#View(cal_environ_screen)
 
 summary(cal_environ_screen$CES.3.0.Percentile)
 
@@ -36,7 +35,7 @@ names(cal_environ_screen)
 #read in race data based on 2010 census tract which is organized by Geocode (geoID2)
 
 race_census <- read.csv("censusTract_race/DEC_10_SF1_QTP3_with_ann.csv")
-race_census
+#View(race_census)
 names(race_census)
 
 #https://walkerke.github.io/tidycensus/articles/spatial-data.html
@@ -53,9 +52,9 @@ b[!(b %in% a)]
 
 #remove mismatced from race_census dataset
 
- 6001990000, 6013990000 6015990000 6017990000 6023990100 6037990100 6037990200 6037990300
- 6041990100 6045990100 6053990000 6059990100 6061990000 6073990100 6075980401 6075990100
- 6079990000 6081990100 6083990000 6087990100 6097990100 6111990100
+# 6001990000, 6013990000 6015990000 6017990000 6023990100 6037990100 6037990200 6037990300
+# 6041990100 6045990100 6053990000 6059990100 6061990000 6073990100 6075980401 6075990100
+# 6079990000 6081990100 6083990000 6087990100 6097990100 6111990100
 
 ```
 
