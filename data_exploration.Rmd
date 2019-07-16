@@ -12,9 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #library load
-install.packages("tidyverse")
+#install.packages("tidyverse")
+#install.packages("sf")
 library(tidyverse)
-
+library(sf)
 
 
 ```
@@ -25,7 +26,7 @@ library(tidyverse)
 
 #read calenvironscreen csv which is organized by GeoID
 
-cal_environ_screen <- read.csv("ces3results.csv")
+cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
 #View(cal_environ_screen)
 
 summary(cal_environ_screen$CES.3.0.Percentile)
@@ -35,8 +36,10 @@ names(cal_environ_screen)
 #read in race data based on 2010 census tract which is organized by Geocode (geoID2)
 
 race_census <- read.csv("censusTract_race/DEC_10_SF1_QTP3_with_ann.csv")
-#View(race_census)
+View(race_census)
 names(race_census)
+
+new_name <- c()
 
 #https://walkerke.github.io/tidycensus/articles/spatial-data.html
 
@@ -55,6 +58,25 @@ b[!(b %in% a)]
 # 6001990000, 6013990000 6015990000 6017990000 6023990100 6037990100 6037990200 6037990300
 # 6041990100 6045990100 6053990000 6059990100 6061990000 6073990100 6075980401 6075990100
 # 6079990000 6081990100 6083990000 6087990100 6097990100 6111990100
+
+```
+
+
+
+
+```{r}
+
+#Subset Race Data to ONLY include GeoID2, Total population, Race Specific Raw and Percent 
+
+race_minimal <- race_census %>% 
+  select("GeoID2", "Number..RACE...Total.population", "Percent..RACE...Total.population", "Number..RACE...Total.population...One.race...White",	"Percent..RACE...Total.population...One.race...White",	"Number..RACE...Total.population...One.race...Black.or.African.American",	"Percent..RACE...Total.population...One.race...Black.or.African.American",	"Number..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Percent..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Number..RACE...Total.population...One.race...Asian",	"Percent..RACE...Total.population...One.race...Asian","Number..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander",	"Percent..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander", "Number..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.", "Percent..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.")
+
+#rename columns (rename "GeoID2" "Census.Tract" to match CalEnvironScreen)
+rename <- c("Census.Tract", "Number_Total", "Percent_Total", "Number_White", "Percent_White", "Number_Black", "Percent_Black", "Number_AmericanIndian_AlaskaNative", "Percent_AmericanIndian_AlaksaNative", "Number_Asian", "Percent_Asian", "Number_Hawaiian_PacificIslander", "Percent_Hawaiian_PacificIslander", "Number_Hispanic_Latinx", "Percent_Hispanic_Latinx")
+
+names(race_minimal) <- rename
+
+
 
 ```
 
