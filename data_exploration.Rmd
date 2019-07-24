@@ -98,6 +98,7 @@ ggplot()+
   geom_sf(data = ca_census_only, fill = "gray40") +
   geom_sf(data = ces_demo_space, aes(color = "CES.3.0.Percentile"), size = 0.5)
 
+
 ```
 
 
