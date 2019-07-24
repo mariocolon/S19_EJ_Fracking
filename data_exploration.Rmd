@@ -104,9 +104,17 @@ ggplot()+
 
 ```{r}
 
+#read in well csv to see data 
+
+well_location_table <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
+
+#see status of all wells 
+
+unique(well_location_table$WellStatus)
+
 #read in and display well fracking data 
 
-well_location <- st_read("Well_Data/Wells_All.shp")
+well_location_spatial <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
 head(well_location)
 
 ggplot()+
