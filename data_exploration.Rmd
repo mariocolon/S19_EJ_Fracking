@@ -29,27 +29,19 @@ library(sf)
 cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
 #View(cal_environ_screen)
 
-summary(cal_environ_screen$CES.3.0.Percentile)
-
 names(cal_environ_screen)
 
 #read in race data based on 2010 census tract which is organized by Geocode (geoID2)
 
 race_census <- read.csv("censusTract_race/DEC_10_SF1_QTP3_with_ann.csv")
-View(race_census)
-names(race_census)
-
-new_name <- c()
 
 #https://walkerke.github.io/tidycensus/articles/spatial-data.html
 
 #look at mismatched geoIDs between two datasets
-cal_environ_screen$Census.Tract[!(cal_environ_screen$Census.Tract %in% race_census$GeoID2)]
 
 a <- as.vector(cal_environ_screen$Census.Tract)
 
 b <- as.vector(race_census$GeoID2)
-
 
 b[!(b %in% a)]
 
@@ -70,14 +62,12 @@ b[!(b %in% a)]
 
 race_minimal <- race_census %>% 
   select("GeoID2", "Number..RACE...Total.population", "Percent..RACE...Total.population", "Number..RACE...Total.population...One.race...White",	"Percent..RACE...Total.population...One.race...White",	"Number..RACE...Total.population...One.race...Black.or.African.American",	"Percent..RACE...Total.population...One.race...Black.or.African.American",	"Number..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Percent..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Number..RACE...Total.population...One.race...Asian",	"Percent..RACE...Total.population...One.race...Asian","Number..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander",	"Percent..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander", "Number..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.", "Percent..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.") %>% 
-  filter(GeoID2 != 6001990000, GeoID2 != 6013990000, GeoID2 != 6013990000, GeoID2 != 6015990000, GeoID2 != 6017990000, GeoID2 != 6023990100, GeoID2 != 6037990100, GeoID2 != 6037990200, GeoID2 != 6037990300, GeoID2 != 6041990100, GeoID2 != 6045990100, GeoID2 != 6053990000, GeoID2 != 6059990100, GeoID2 != 6061990000, GeoID2 != 6073990100, GeoID2 != 6075980401, GeoID2 != 6075990100, GeoID2 != 6079990000, GeoID2 != 6081990100, GeoID2 != 6083990000, GeoID2 != 6087990100, GeoID2 != 6097990100, GeoID2 != 6111990100)
+  filter(!GeoID2 %in% c(6001990000, 6013990000, 6015990000, 6017990000, 6023990100, 6037990100, 6037990200, 6037990300, 6041990100, 6045990100, 6053990000, 6059990100, 6061990000, 6073990100, 6075980401, 6075990100, 6079990000, 6081990100, 6083990000, 6087990100, 6097990100, 6111990100))
 
 #rename columns (rename "GeoID2" "Census.Tract" to match CalEnvironScreen)
 rename <- c("Census.Tract", "Number_Total", "Percent_Total", "Number_White", "Percent_White", "Number_Black", "Percent_Black", "Number_AmericanIndian_AlaskaNative", "Percent_AmericanIndian_AlaksaNative", "Number_Asian", "Percent_Asian", "Number_Hawaiian_PacificIslander", "Percent_Hawaiian_PacificIslander", "Number_Hispanic_Latinx", "Percent_Hispanic_Latinx")
 
 names(race_minimal) <- rename
-
-race_minimal
 
 #merge two dataframes for complete CalEnvironScreen (ces) and Census Tract Demograohics (demo)
 
@@ -88,4 +78,39 @@ head(ces_demo)
 ```
 
 
+
+
+```{r}
+
+#read in csv files
+
+ces_demo_space <- st_as_sf(ces_demo, coords = c("Longitude", "Latitude"), crs = 4326)
+
+#get CA census tract visual 
+
+ca_census <- st_read("tl_2016_06_tract/tl_2016_06_tract.shp")
+
+ca_census_only <- ca_census %>% 
+  select(GEOID)
+
+
+ggplot()+
+  geom_sf(data = ca_census_only, fill = "gray40") +
+  geom_sf(data = ces_demo_space, aes(color = "CES.3.0.Percentile"), size = 0.5)
+
+```
+
+
+```{r}
+
+#read in and display well fracking data 
+
+well_location <- st_read("Well_Data/Wells_All.shp")
+head(well_location)
+
+ggplot()+
+  geom_sf(data = ca_census_only, fill = "gray40") +
+  geom_sf(data = well_location, aes(color = "API"), size = 0.5)
+
+```
 
