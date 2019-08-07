@@ -17,22 +17,19 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("leaflet")
 #install.packages("tmap")
 #install.packages("GISTools")
-<<<<<<< HEAD
+
 #install.packages("spdplyr")
-=======
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
+
 
 library(tidyverse)
 library(sf)
 library(leaflet)
 library(tmap)
 library(raster)
-<<<<<<< HEAD
-#library(spdplyr)
-=======
-library(GISTools)
 
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
+#library(spdplyr)
+
+
 ```
 
 
@@ -41,11 +38,11 @@ library(GISTools)
 
 #read calenvironscreen csv which is organized by GeoID
 
-<<<<<<< HEAD
+
 #cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
-=======
+
 cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
+
 
 #View(cal_environ_screen)
 
@@ -53,11 +50,10 @@ cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
 
 #read in race data based on 2010 census tract which is organized by Geocode (geoID2)
 
-<<<<<<< HEAD
+
 #race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
-=======
+
 race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
 
 #https://walkerke.github.io/tidycensus/articles/spatial-data.html
 
@@ -107,7 +103,6 @@ race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
 ```{r}
 
 #read in CES June 2018 shapefile
-<<<<<<< HEAD
 
 ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
@@ -124,7 +119,6 @@ colnames(ces_shapefile)
 tmap_mode("view")
 tm_shape(ces_shapefile) +
   tm_polygons("CIscoreP")
-=======
 
 ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
@@ -132,7 +126,6 @@ ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Upd
 colnames(ces_shapefile)
 unique(ces_shapefile$CIscoreP)
 
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
 
 tmap_mode("view")
 tm_shape(ces_shapefile) +
@@ -144,7 +137,7 @@ tm_shape(ces_shapefile) +
 
 ```{r}
 
-<<<<<<< HEAD
+
 tmap_mode("view")
 tm_shape(ces_shapefile) +
   tm_polygons("povP")
@@ -181,20 +174,8 @@ colnames(well_location_table)
 leaflet(data = well_location_table) %>% 
   addTiles() %>% 
   addMarkers(clusterOptions = markerClusterOptions())
-=======
-#read in and display well fracking data 
-
-well_location_spatial <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
-well_location_table <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
-
-colnames(well_location_table)
-#"Latitude"   "Longitude" 
 
 
-leaflet(well_location_table) %>% 
-  addTiles() %>% 
-  addMarkers(lng = ~Longitud
->>>>>>> a88ae5abb07f0bde70e2620a8327974367df086d
              
 
 ```
