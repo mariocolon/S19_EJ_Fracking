@@ -14,9 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 #library load
 #install.packages("tidyverse")
 #install.packages("sf")
+#install.packages("leaflet")
+#install.packages("tmap")
+
 library(tidyverse)
 library(sf)
-
+library(leaflet)
+library(tmap)
 
 ```
 
@@ -33,7 +37,7 @@ names(cal_environ_screen)
 
 #read in race data based on 2010 census tract which is organized by Geocode (geoID2)
 
-race_census <- read.csv("censusTract_race/DEC_10_SF1_QTP3_with_ann.csv")
+race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
 
 #https://walkerke.github.io/tidycensus/articles/spatial-data.html
 
@@ -82,9 +86,9 @@ head(ces_demo)
 
 ```{r}
 
-#read in csv files
+#read in CES June 2018 shapefile
 
-ces_demo_space <- st_as_sf(ces_demo, coords = c("Longitude", "Latitude"), crs = 4326)
+ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
 #get CA census tract visual 
 
@@ -94,10 +98,13 @@ ca_census_only <- ca_census %>%
   select(GEOID)
 
 
-ggplot()+
+ces_census <- ggplot()+
   geom_sf(data = ca_census_only, fill = "gray40") +
   geom_sf(data = ces_demo_space, aes(color = "CES.3.0.Percentile"), size = 0.5)
 
+tmap_mode("view")
+tm_shape(ca_census_only) +
+    tm_polygons("GEOID")
 
 ```
 
@@ -115,11 +122,11 @@ unique(well_location_table$WellStatus)
 #read in and display well fracking data 
 
 well_location_spatial <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
-head(well_location)
+head(well_location_spatial)
 
 ggplot()+
   geom_sf(data = ca_census_only, fill = "gray40") +
-  geom_sf(data = well_location, aes(color = "API"), size = 0.5)
+  geom_sf(data = well_location_spatial, aes(color = "API"), size = 0.5)
 
 ```
 
