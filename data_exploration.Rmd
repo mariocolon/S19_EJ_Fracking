@@ -217,6 +217,28 @@ leaflet(data = well_location_NEW) %>%
 
 ```{r}
 
+#using intersection function 
+
+ces_shapefile <- st_as_sf(ces_shapefile)
+plot(ces_shapefile, graticule = st_crs(4326), key.pos = 1)
+
+
+plot(well_location_spatial, pch = 19, col = "black", add = TRUE)
+
+
+
+st_crs(ces_shapefile) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
+st_crs(well_location_spatial) <- ces_shapefile
+
+
+
+intersect <- st_intersection(ces_shapefile, well_location_NEW)
+
+```
+
+
+```{r}
+
 #Using over() function 
 
 #convert well_location_NEW to SpatialPointData
@@ -235,9 +257,6 @@ results <- over(well_location_NEW, ces_shapefile2)
 
 table(results$Name_1)
 
-
-#using intersection function 
-interaction(ces_shapefile2, well_location_NEW)
 
 ```
 
