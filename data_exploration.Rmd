@@ -218,18 +218,18 @@ leaflet(data = well_location_NEW) %>%
 ```{r}
 
 #Using over() function 
-
+ 
 #convert well_location_NEW to SpatialPointData
 coordinates(well_location_NEW) <- c("Longitude","Latitude")
 
 #re_read CES as SpatialPolygonData
-
+ 
 ces_shapefile2 <- readOGR(file.choose())
-
+ 
 #set projection 
 
 proj4string(well_location_NEW) <- proj4string(ces_shapefile2)
-
+ 
 #count points within CES polygons
 results <- over(well_location_NEW, ces_shapefile2)
 
@@ -247,7 +247,7 @@ interaction(ces_shapefile2, well_location_NEW)
 #Using poly.count() function
 
 poly.counts(well_location_NEW, ces_shapefile2) -> results2
-
+ 
 setNames(results2, ces_shapefile2@data)
 
 
