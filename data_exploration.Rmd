@@ -180,16 +180,6 @@ well_location_ACTIVE <- well_location_table %>%
 #filter out only NEW wells
 well_location_NEW <- well_location_table %>% 
   filter(WellStatus == "New") 
-
-
-unique(well_location_ACTIVE$WellStatus)
-#Canceled Active   New      Plugged  Unknown  Idle     Buried   Abeyance
-
-unique(well_location_table)
-#"Latitude"   "Longitude" 
-
-
-
              
 
 ```
@@ -217,24 +207,28 @@ leaflet(data = well_location_NEW) %>%
 
 ```{r}
 
-#using intersection function 
+#using st_intersection function 
 
-ces_shapefile <- st_as_sf(ces_shapefile)
-plot(ces_shapefile, graticule = st_crs(4326), key.pos = 1)
-
-
-plot(well_location_spatial, pch = 19, col = "black", add = TRUE)
+well <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
+ces <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
 
 
-st_crs(ces_shapefile) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
-st_crs(well_location_spatial) <- ces_shapefile
 
+ces2 <- ces[, "tract"]  
 
+intersect <- st_intersection(ces2, well)
 
-intersect <- st_intersection(ces_shapefile, well_location_NEW)
+tract_values <- table(intersect$tract)
+
+tract_values <- as.data.frame(tract_values)
+
+colnames(tract_values) <- c("Tract", "Number_Well_Sites")
+
+head(sort(tract_values$Tract, decreasing=TRUE), 5)
 
 ```
+
 
 
 ```{r}
