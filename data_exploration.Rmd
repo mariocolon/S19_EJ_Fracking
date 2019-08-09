@@ -120,16 +120,6 @@ colnames(ces_shapefile)
 
 ```{r}
 
-tmap_mode("view")
-tm_shape(ces_shapefile) +
-  tm_polygons("CIscoreP")
-
-ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
-
-
-colnames(ces_shapefile)
-unique(ces_shapefile$CIscoreP)
-
 
 tmap_mode("view")
 tm_shape(ces_shapefile) +
@@ -213,8 +203,6 @@ well <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
 ces <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
 
-
-
 ces2 <- ces[, "tract"]  
 
 intersect <- st_intersection(ces2, well)
@@ -225,7 +213,7 @@ tract_values <- as.data.frame(tract_values)
 
 colnames(tract_values) <- c("Tract", "Number_Well_Sites")
 
-head(sort(tract_values$Tract, decreasing=TRUE), 5)
+head(sort(tract_values$Number_Well_Sites, decreasing=TRUE), 5)
 
 ```
 
