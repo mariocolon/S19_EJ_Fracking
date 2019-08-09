@@ -120,16 +120,6 @@ colnames(ces_shapefile)
 
 ```{r}
 
-tmap_mode("view")
-tm_shape(ces_shapefile) +
-  tm_polygons("CIscoreP")
-
-ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
-
-
-colnames(ces_shapefile)
-unique(ces_shapefile$CIscoreP)
-
 
 tmap_mode("view")
 tm_shape(ces_shapefile) +
@@ -180,16 +170,6 @@ well_location_ACTIVE <- well_location_table %>%
 #filter out only NEW wells
 well_location_NEW <- well_location_table %>% 
   filter(WellStatus == "New") 
-
-
-unique(well_location_ACTIVE$WellStatus)
-#Canceled Active   New      Plugged  Unknown  Idle     Buried   Abeyance
-
-unique(well_location_table)
-#"Latitude"   "Longitude" 
-
-
-
              
 
 ```
@@ -217,6 +197,30 @@ leaflet(data = well_location_NEW) %>%
 
 ```{r}
 
+#using st_intersection function 
+
+well <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
+ces <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
+
+
+ces2 <- ces[, "tract"]  
+
+intersect <- st_intersection(ces2, well)
+
+tract_values <- table(intersect$tract)
+
+tract_values <- as.data.frame(tract_values)
+
+colnames(tract_values) <- c("Tract", "Number_Well_Sites")
+
+head(sort(tract_values$Number_Well_Sites, decreasing=TRUE), 5)
+
+```
+
+
+
+```{r}
+
 #Using over() function 
  
 #convert well_location_NEW to SpatialPointData
@@ -235,9 +239,6 @@ results <- over(well_location_NEW, ces_shapefile2)
 
 table(results$Name_1)
 
-
-#using intersection function 
-interaction(ces_shapefile2, well_location_NEW)
 
 ```
 
