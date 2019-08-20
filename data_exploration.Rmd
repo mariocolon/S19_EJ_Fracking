@@ -13,25 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 
 #library load
-#install.packages("tidyverse")
-#install.packages("sf")
-#install.packages("leaflet")
-#install.packages("tmap")
-#install.packages("GISTools")
-
-#install.packages("spdplyr")
-
 
 library(tidyverse)
 library(sf)
-library(sp)
 library(leaflet)
 library(tmap)
 library(raster)
 library(maptools)
 library(rgdal)
-library(GISTools)
-#library(spdplyr)
+
 
 
 ```
@@ -39,78 +29,11 @@ library(GISTools)
 
 ```{r}
 
-
-#read calenvironscreen csv which is organized by GeoID
-
-
-#cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
-
-#cal_environ_screen <- read.csv("CalEnvironScreen/ces3results.csv")
-
-
-#View(cal_environ_screen)
-
-#names(cal_environ_screen)
-
-#read in race data based on 2010 census tract which is organized by Geocode (geoID2)
-
-
-#race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
-
-#race_census <- read.csv("CensusTract_RACE/DEC_10_SF1_QTP3_with_ann.csv")
-
-#https://walkerke.github.io/tidycensus/articles/spatial-data.html
-
-#look at mismatched geoIDs between two datasets
-
-#a <- as.vector(cal_environ_screen$Census.Tract)
-
-#b <- as.vector(race_census$GeoID2)
-
-#b[!(b %in% a)]
-
-#remove mismatced from race_census dataset
-
-# 6001990000, 6013990000 6015990000 6017990000 6023990100 6037990100 6037990200 6037990300
-# 6041990100 6045990100 6053990000 6059990100 6061990000 6073990100 6075980401 6075990100
-# 6079990000 6081990100 6083990000 6087990100 6097990100 6111990100
-
-```
-
-
-
-
-```{r}
-
-#Subset Race Data to ONLY include GeoID2, Total population, Race Specific Raw and Percent 
-
-#race_minimal <- race_census %>% 
-#  select("GeoID2", "Number..RACE...Total.population", "Percent..RACE...Total.population", "Number..RACE...Total.population...One.race...White",	"Percent..RACE...Total.population...One.race...White",	"Number..RACE...Total.population...One.race...Black.or.African.American",	"Percent..RACE...Total.population...One.race...Black.or.African.American",	"Number..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Percent..RACE...Total.population...One.race...American.Indian.and.Alaska.Native","Number..RACE...Total.population...One.race...Asian",	"Percent..RACE...Total.population...One.race...Asian","Number..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander",	"Percent..RACE...Total.population...One.race...Native.Hawaiian.and.Other.Pacific.Islander", "Number..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.", "Percent..HISPANIC.OR.LATINO...Total.population...Hispanic.or.Latino..of.any.race.") %>% 
-#  filter(!GeoID2 %in% c(6001990000, 6013990000, 6015990000, 6017990000, 6023990100, 6037990100, 6037990200, 6037990300, 6041990100, 6045990100, 6053990000, 6059990100, 6061990000, 6073990100, 6075980401, 6075990100, 6079990000, 6081990100, 6083990000, 6087990100, 6097990100, 6111990100))
-
-#rename columns (rename "GeoID2" "Census.Tract" to match CalEnvironScreen)
-#rename <- c("Census.Tract", "Number_Total", "Percent_Total", "Number_White", "Percent_White", "Number_Black", "Percent_Black", "Number_AmericanIndian_AlaskaNative", "Percent_AmericanIndian_AlaksaNative", "Number_Asian", "Percent_Asian", "Number_Hawaiian_PacificIslander", "Percent_Hawaiian_PacificIslander", "Number_Hispanic_Latinx", "Percent_Hispanic_Latinx")
-
-#names(race_minimal) <- rename
-
-#merge two dataframes for complete CalEnvironScreen (ces) and Census Tract Demograohics (demo)
-
-#ces_demo <- merge(cal_environ_screen, race_minimal, by = "Census.Tract")
-
-#head(ces_demo)
-
-```
-
-
-
-
-```{r}
-
-#read in CES June 2018 shapefile
+#read in CalEnvironScreen June 2018 shapefile
 
 ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
-
+#read column names for shapefile
 colnames(ces_shapefile)
 
 
@@ -120,8 +43,10 @@ colnames(ces_shapefile)
 
 ```{r}
 
-
+#set tmap as interactive mode
 tmap_mode("view")
+
+#read in visual for CalEnvironScreen with polygons set the CalEnvironScreen Score (Pollution Burden * Population Characteristics) AS PERCENTILE
 tm_shape(ces_shapefile) +
   tm_polygons("CIscoreP") 
 
@@ -133,6 +58,7 @@ tm_shape(ces_shapefile) +
 
 
 tmap_mode("view")
+#read in visual for CalEnvironScreen with polygons set the POVERTY level AS PERCENTILE
 tm_shape(ces_shapefile) +
   tm_polygons("povP")
 
@@ -144,11 +70,14 @@ tm_shape(ces_shapefile) +
 ```{r}
 
 tmap_mode("view")
+
+#read in visual for CalEnvironScreen with polygons set the Race_PERCENTILE by Census Tract
 tm_shape(ces_shapefile) +
   tm_polygons(c("Hispanic_p", "White_pct",  "African_Am", "Native_Ame", "Asian_Amer", "Other_pct")) +
   tm_facets(sync = TRUE) +
   tmap_options(limits = c(facets.view = 6))
 
+
 ```
 
 
@@ -156,27 +85,29 @@ tm_shape(ces_shapefile) +
 
 ```{r}
 
-#read in and display well fracking data 
+#read in fracking data as csv data.frame
+ASTABLE_well_location <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
 
-well_location_spatial <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
-well_location_table <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
+#convert table to spatial data
+ASSPATIAL_well_location <- st_as_sf(ASTABLE_well_location, coords = c("Longitude", "Latitude"), crs = 4326)
 
-colnames(well_location_table)
+#filter out only Oil and Gas Wells (OG) and ACTIVE wells
+ACTIVE_well_location <- ASSPATIAL_well_location %>%
+  filter(WellType == "OG" & WellStatus == "Active") 
 
-#filter out only ACTIVE wells
-well_location_ACTIVE <- well_location_table %>% 
-  filter(WellStatus == "Active") 
-
-#filter out only NEW wells
-well_location_NEW <- well_location_table %>% 
-  filter(WellStatus == "New") 
+#filter out only Oil and Gas Wells (OG) and NEW wells (Recently permitted well; in the process of being drilled)
+NEW_well_location <- ASSPATIAL_well_location %>% 
+  filter(WellType == "OG" & WellStatus == "New") 
              
 
 ```
 
+
+
 ```{r}
 
-leaflet(data = well_location_ACTIVE) %>% 
+#display ACTIVE well location as clusters across CA
+leaflet(data = ACTIVE_well_location) %>% 
   addTiles() %>% 
   addMarkers(clusterOptions = markerClusterOptions())
 
@@ -185,40 +116,19 @@ leaflet(data = well_location_ACTIVE) %>%
 
 ```{r}
 
-
-leaflet(data = well_location_NEW) %>% 
+#display NEW well location as clusters across CA
+leaflet(data = NEW_well_location) %>% 
   addTiles() %>% 
   addMarkers(clusterOptions = markerClusterOptions())
 
 
-```
-
-##Find number of points in each polygon 
-
-```{r}
-
-#using st_intersection function 
-
-well <- st_read("Well_Data/AllWells_spatial/Wells_All.shp")
-ces <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
-
-
-ces2 <- ces[, "tract"]  
-
-intersect <- st_intersection(ces2, well)
-
-tract_values <- table(intersect$tract)
-
-tract_values <- as.data.frame(tract_values)
-
-colnames(tract_values) <- c("Tract", "Number_Well_Sites")
-
-head(sort(tract_values$Number_Well_Sites, decreasing=TRUE), 5)
 
 ```
 
 
+##Find number of NEW well locations 
 
+<<<<<<< HEAD
 ```{r}
 
 #Using over() function 
@@ -236,22 +146,46 @@ proj4string(well_location_NEW) <- proj4string(ces_shapefile2)
  
 #count points within CES polygons
 results <- over(well_location_NEW, ces_shapefile2)
-
-table(results$Name_1)
-
-
-```
-
+=======
 
 ```{r}
 
-#Using poly.count() function
 
+#using st_intersection function 
+#https://gis.stackexchange.com/questions/110117/counting-number-of-points-in-polygon-using-r
+>>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
+
+#set CES and NEW_Well location as st objects
+ces <- st_as_sf(ces_shapefile)
+new_well <- st_as_sf(NEW_well_location)
+
+#reset CRS for both to match (just to make sure)
+st_crs(ces) <- 4326
+st_crs(new_well) <- 4326
+
+#use st_intersect to get instersection of points (new_well) in polygons (ces)
+NEW_intersect <- st_intersection(x = ces, y = new_well)
+
+#subset count of well locations in polygons
+int_results <- NEW_intersect %>% 
+  group_by(tract) %>% 
+  count()
+
+
+
+<<<<<<< HEAD
 poly.counts(well_location_NEW, ces_shapefile2) -> results2
  
 setNames(results2, ces_shapefile2@data)
+=======
+#PROBLEM - when st_intersection is used, all unique tracts are lost retaining ONLY tract#: 6109003100, not sure why ... see head for ces$tract and New_intersect$tract
+
+head(ces$tract)
+head(NEW_intersect$tract)
+>>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
 
 
 
 ```
+
 
