@@ -134,39 +134,50 @@ leaflet(data = NEW_well_location) %>%
 #Using over() function 
  
 #convert well_location_NEW to SpatialPointData
-coordinates(well_location_NEW) <- c("Longitude","Latitude")
+# coordinates(well_location_NEW) <- c("Longitude","Latitude")
 
 #re_read CES as SpatialPolygonData
  
-ces_shapefile2 <- readOGR(file.choose())
+# ces_shapefile2 <- readOGR(file.choose())
  
 #set projection 
 
-proj4string(well_location_NEW) <- proj4string(ces_shapefile2)
+# proj4string(well_location_NEW) <- proj4string(ces_shapefile2)
  
 #count points within CES polygons
-results <- over(well_location_NEW, ces_shapefile2)
-=======
+# results <- over(well_location_NEW, ces_shapefile2)
+# =======
+```
 
 ```{r}
 
 
 #using st_intersection function 
 #https://gis.stackexchange.com/questions/110117/counting-number-of-points-in-polygon-using-r
->>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
+# >>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
 
 #set CES and NEW_Well location as st objects
-ces <- st_as_sf(ces_shapefile)
+ces <- st_as_sf(ces_shapefile, coords = c("Longitude","Latitude"))
+
 new_well <- st_as_sf(NEW_well_location)
 
 #reset CRS for both to match (just to make sure)
-st_crs(ces) <- 4326
+st_transform(ces, 4326)
 st_crs(new_well) <- 4326
 
-#use st_intersect to get instersection of points (new_well) in polygons (ces)
+
+#use st_intersect to get instersection of points (new_well) in polygons (ces).
+
+### Allison notes: this is confusing to me... aren't both ces here (just has a latitude & longitude coordinate for each row, so aren't these just spatial points) and new_well locations both spatial points? Then trying to find an intersection doesn't make sense. Intersection works when trying to find points within a polygon.
+
 NEW_intersect <- st_intersection(x = ces, y = new_well)
 
 #subset count of well locations in polygons
+
+# So if there are no intersections because they're both spatial points, then NEW_intersection might only contain the one place where both a well location and the ces location point are exactly the same (but either way, it doesn't really make sense to try to find intersections between two sets of spatial points)...
+
+# Which means that this won't work how you want it to. 
+
 int_results <- NEW_intersect %>% 
   group_by(tract) %>% 
   count()
