@@ -135,20 +135,31 @@ leaflet(data = NEW_well_location) %>%
 #using st_intersection function 
 #https://gis.stackexchange.com/questions/110117/counting-number-of-points-in-polygon-using-r
 
-
+#set CES and NEW_Well location as st objects
 ces <- st_as_sf(ces_shapefile)
 new_well <- st_as_sf(NEW_well_location)
 
+#reset CRS for both to match (just to make sure)
 st_crs(ces) <- 4326
 st_crs(new_well) <- 4326
 
+#use st_intersect to get instersection of points (new_well) in polygons (ces)
 NEW_intersect <- st_intersection(x = ces, y = new_well)
 
+#subset count of well locations in polygons
 int_results <- NEW_intersect %>% 
   group_by(tract) %>% 
   count()
 
 
 
+#PROBLEM - when st_intersection is used, all unique tracts are lost retaining ONLY tract#: 6109003100, not sure why ... see head for ces$tract and New_intersect$tract
+
+head(ces$tract)
+head(NEW_intersect$tract)
+
+
 
 ```
+
+
