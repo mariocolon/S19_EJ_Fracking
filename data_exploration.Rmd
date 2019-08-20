@@ -13,14 +13,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 
 #library load
-#install.packages("tidyverse")
-#install.packages("sf")
-#install.packages("leaflet")
-#install.packages("tmap")
-#install.packages("GISTools")
-
-#install.packages("spdplyr")
-
 
 library(tidyverse)
 library(sf)
@@ -29,7 +21,7 @@ library(tmap)
 library(raster)
 library(maptools)
 library(rgdal)
-#library(spdplyr)
+
 
 
 ```
@@ -37,7 +29,7 @@ library(rgdal)
 
 ```{r}
 
-#read in CES June 2018 shapefile
+#read in CalEnvironScreen June 2018 shapefile
 
 ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
 
@@ -94,17 +86,17 @@ tm_shape(ces_shapefile) +
 ```{r}
 
 #read in fracking data as csv data.frame
-well_location_table <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
+ASTABLE_well_location <- read.csv("Well_Data/AllWells_table/AllWells_20190724.csv")
 
 #convert table to spatial data
-well_location_spatial <- st_as_sf(well_location_table, coords = c("Longitude", "Latitude"), crs = 4326)
+ASSPATIAL_well_location <- st_as_sf(ASTABLE_well_location, coords = c("Longitude", "Latitude"), crs = 4326)
 
 #filter out only Oil and Gas Wells (OG) and ACTIVE wells
-well_location_ACTIVE <- well_location_spatial %>%
+ACTIVE_well_location <- ASSPATIAL_well_location %>%
   filter(WellType == "OG" & WellStatus == "Active") 
 
 #filter out only Oil and Gas Wells (OG) and NEW wells (Recently permitted well; in the process of being drilled)
-well_location_NEW <- well_location_spatial %>% 
+NEW_well_location <- ASSPATIAL_well_location %>% 
   filter(WellType == "OG" & WellStatus == "New") 
              
 
@@ -115,7 +107,7 @@ well_location_NEW <- well_location_spatial %>%
 ```{r}
 
 #display ACTIVE well location as clusters across CA
-leaflet(data = well_location_ACTIVE) %>% 
+leaflet(data = ACTIVE_well_location) %>% 
   addTiles() %>% 
   addMarkers(clusterOptions = markerClusterOptions())
 
@@ -125,7 +117,7 @@ leaflet(data = well_location_ACTIVE) %>%
 ```{r}
 
 #display NEW well location as clusters across CA
-leaflet(data = well_location_NEW) %>% 
+leaflet(data = NEW_well_location) %>% 
   addTiles() %>% 
   addMarkers(clusterOptions = markerClusterOptions())
 
@@ -133,56 +125,30 @@ leaflet(data = well_location_NEW) %>%
 
 ```
 
-#Merge Well Information and Census Tract by GEOID
 
-```{r}
-
-st_union(well_location_spatial, tract)
-
-
-```
-
-
-
-##Find number of ACTIVE or  NEW well locations 
+##Find number of NEW well locations 
 
 
 ```{r}
 
-
-tract <- st_read("tl_2016_06_tract/tl_2016_06_tract.shp")
-st_transform(tract, 4326)
-
-class(tract)
-
-active_well_by_census <- well_location_ACTIVE %>% 
-  group_by()
-
-
-
-
-```
-
-
-
-##Find number of points in each polygon 
-
-```{r}
 
 #using st_intersection function 
+#https://gis.stackexchange.com/questions/110117/counting-number-of-points-in-polygon-using-r
+
+
+ces <- st_as_sf(ces_shapefile)
+new_well <- st_as_sf(NEW_well_location)
+
+st_crs(ces) <- 4326
+st_crs(new_well) <- 4326
+
+NEW_intersect <- st_intersection(x = ces, y = new_well)
+
+int_results <- NEW_intersect %>% 
+  group_by(tract) %>% 
+  count()
 
 
 
-ces2 <- ces[, "tract"]  
-
-intersect <- st_intersection(ces2, well)
-
-tract_values <- table(intersect$tract)
-
-tract_values <- as.data.frame(tract_values)
-
-colnames(tract_values) <- c("Tract", "Number_Well_Sites")
-
-head(sort(tract_values$Number_Well_Sites, decreasing=TRUE), 5)
 
 ```
