@@ -31,7 +31,8 @@ library(rgdal)
 
 #read in CalEnvironScreen June 2018 shapefile
 
-ces_shapefile <- st_read("CalEnvironScreen/CESJune2018Update_SHP/CES3June2018Update.shp")
+ces_shapefile <- st_read(dsn = "CalEnvironScreen/CESJune2018Update_SHP", layer = "CES3June2018Update")
+
 
 #read column names for shapefile
 colnames(ces_shapefile)
@@ -157,7 +158,7 @@ leaflet(data = NEW_well_location) %>%
 # >>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
 
 #set CES and NEW_Well location as st objects
-ces <- st_as_sf(ces_shapefile, coords = c("Longitude","Latitude"))
+ces <- ces_shapefile
 
 new_well <- st_as_sf(NEW_well_location)
 
@@ -165,6 +166,7 @@ new_well <- st_as_sf(NEW_well_location)
 st_transform(ces, 4326)
 st_crs(new_well) <- 4326
 
+head(new_well$geometry)
 
 #use st_intersect to get instersection of points (new_well) in polygons (ces).
 
