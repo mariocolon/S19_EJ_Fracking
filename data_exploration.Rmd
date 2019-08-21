@@ -127,35 +127,13 @@ leaflet(data = NEW_well_location) %>%
 ```
 
 
-##Find number of NEW well locations 
-
-<<<<<<< HEAD
-```{r}
-
-#Using over() function 
- 
-#convert well_location_NEW to SpatialPointData
-# coordinates(well_location_NEW) <- c("Longitude","Latitude")
-
-#re_read CES as SpatialPolygonData
- 
-# ces_shapefile2 <- readOGR(file.choose())
- 
-#set projection 
-
-# proj4string(well_location_NEW) <- proj4string(ces_shapefile2)
- 
-#count points within CES polygons
-# results <- over(well_location_NEW, ces_shapefile2)
-# =======
-```
+##Find number of NEW well locations in specific tracts
 
 ```{r}
 
 
 #using st_intersection function 
 #https://gis.stackexchange.com/questions/110117/counting-number-of-points-in-polygon-using-r
-# >>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
 
 #set CES and NEW_Well location as st objects
 ces <- ces_shapefile
@@ -163,16 +141,18 @@ ces <- ces_shapefile
 new_well <- st_as_sf(NEW_well_location)
 
 #reset CRS for both to match (just to make sure)
-st_transform(ces, 4326)
-st_crs(new_well) <- 4326
+ces2 = st_transform(ces, 4326)
 
-head(new_well$geometry)
+new_well2 = st_transform(new_well, 4326)
+
+
 
 #use st_intersect to get instersection of points (new_well) in polygons (ces).
 
 ### Allison notes: this is confusing to me... aren't both ces here (just has a latitude & longitude coordinate for each row, so aren't these just spatial points) and new_well locations both spatial points? Then trying to find an intersection doesn't make sense. Intersection works when trying to find points within a polygon.
 
-NEW_intersect <- st_intersection(x = ces, y = new_well)
+NEW_intersect <- st_intersection(ces2, new_well2)
+
 
 #subset count of well locations in polygons
 
@@ -184,18 +164,7 @@ int_results <- NEW_intersect %>%
   group_by(tract) %>% 
   count()
 
-
-
-# <<<<<<< HEAD
-# poly.counts(well_location_NEW, ces_shapefile2) -> results2
-#  
-# setNames(results2, ces_shapefile2@data)
-# =======
-#PROBLEM - when st_intersection is used, all unique tracts are lost retaining ONLY tract#: 6109003100, not sure why ... see head for ces$tract and New_intersect$tract
-
-# head(ces$tract)
-# head(NEW_intersect$tract)
-# >>>>>>> 166e36c5d9fcc421f979fba988895baa5a615373
+as.data.frame(int_results)[,-3]
 
 
 
