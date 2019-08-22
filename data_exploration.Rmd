@@ -66,23 +66,6 @@ tm_shape(ces_shapefile) +
 ```
 
 
-###Along Racial Lines (Percent by Census Tract)
-
-```{r}
-
-tmap_mode("view")
-
-#read in visual for CalEnvironScreen with polygons set the Race_PERCENTILE by Census Tract
-tm_shape(ces_shapefile) +
-  tm_polygons(c("Hispanic_p", "White_pct",  "African_Am", "Native_Ame", "Asian_Amer", "Other_pct")) +
-  tm_facets(sync = TRUE, ncol = 3) +
-  tmap_options(limits = c(facets.view = 6))
-
-```
-
-
-
-
 ```{r}
 
 #read in fracking data as csv data.frame
