@@ -75,9 +75,8 @@ tmap_mode("view")
 #read in visual for CalEnvironScreen with polygons set the Race_PERCENTILE by Census Tract
 tm_shape(ces_shapefile) +
   tm_polygons(c("Hispanic_p", "White_pct",  "African_Am", "Native_Ame", "Asian_Amer", "Other_pct")) +
-  tm_facets(sync = TRUE) +
+  tm_facets(sync = TRUE, ncol = 3) +
   tmap_options(limits = c(facets.view = 6))
-
 
 ```
 
@@ -137,20 +136,12 @@ ces = st_transform(ces_shapefile, 4326)
 
 new_well = st_transform(NEW_well_location, 4326)
 
-
-
 #use st_intersect to get instersection of points (new_well) in polygons (ces).
-
-### Allison notes: this is confusing to me... aren't both ces here (just has a latitude & longitude coordinate for each row, so aren't these just spatial points) and new_well locations both spatial points? Then trying to find an intersection doesn't make sense. Intersection works when trying to find points within a polygon.
 
 NEW_intersect <- st_intersection(ces, new_well)
 
 
 #subset count of well locations in polygons
-
-# So if there are no intersections because they're both spatial points, then NEW_intersection might only contain the one place where both a well location and the ces location point are exactly the same (but either way, it doesn't really make sense to try to find intersections between two sets of spatial points)...
-
-# Which means that this won't work how you want it to. 
 
 new_well_count <- NEW_intersect %>% 
   group_by(tract) %>% 
@@ -192,24 +183,23 @@ active_well_count <- ACTIVE_intersect %>%
 
 active_well_count <- as.data.frame(active_well_count)[,-3]
 
-
-
-
 ```
 
-##Merge well count back into CES file
+
+##Merge well count back into CES shapefile
+
 
 ```{r}
 
-ces_new_well <- merge(ces, new_well_count, by = "tract") %>% 
+#outer merge CalEnvironscree with new_well_count, NA for those tracts with no value (rename column new_wells)
+ces_nwell_only <- merge(ces, new_well_count, by = "tract", all = TRUE) %>% 
   rename(new_wells = n)
 
-ces_new_well$
 
-ces_active_well <- merge(ces, active_well_count, by = "tract") %>% 
+#outer merge CalEnvironscree with active_well_count, NA for those tracts with no value (rename column new_wells)
+
+ces_well_FINAL <- merge(ces_nwell_only, active_well_count, by = "tract", all = TRUE) %>% 
   rename(active_wells = n)
-
-
 
 ```
 
@@ -218,27 +208,15 @@ ces_active_well <- merge(ces, active_well_count, by = "tract") %>%
 
 ```{r}
 
-tmap_mode("view")
-
-#read in visual for CalEnvironScreen with polygons set the Race_PERCENTILE by Census Tract
-tm_shape(ces_new_well) +
-  tm_polygons(c("CIscoreP", "new_wells")) +
-  tm_facets(sync = TRUE) +
-  tmap_options(limits = c(facets.view = 2))
-
-```
-
-#View CIS Scores and Active Wells
-
-```{r}
 
 tmap_mode("view")
 
-#read in visual for CalEnvironScreen with polygons set the Race_PERCENTILE by Census Tract
-tm_shape(ces_active_well) +
-  tm_polygons(c("CIscoreP", "active_wells")) +
-  tm_facets(sync = TRUE) +
-  tmap_options(limits = c(facets.view = 2))
+#read in visual for CalEnvironScreen with polygons set the CalEnvironScreen Score, New Wells and Poverty Percentile by Census Tract (add OpenStreetMap)
+tm_shape(ces_well_FINAL) +
+  tm_polygons(c("CIscoreP", "povP", "new_wells", "active_wells")) +
+  tm_facets(sync = TRUE, ncol = 2) +
+  tmap_options(limits = c(facets.view = 4)) +
+  tm_basemap(c("OpenStreetMap"))
 
 ```
 
