@@ -35,7 +35,7 @@ ces_shapefile <- st_read(dsn = "CalEnvironScreen/CESJune2018Update_SHP", layer =
 
 
 #read column names for shapefile
-colnames(ces_shapefile)
+class(ces_shapefile)
 
 
 ```
